@@ -12,6 +12,10 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+        full:
+          description: 'Is full build'     
+          required: false
 
 concurrency: staging_environment
 
@@ -39,7 +43,7 @@ jobs:
           [ "$(ls -A ./markdown-pages)" ] || echo "::set-output name=isEmpty::true"
       
       - name: Run a script
-        if: ${{ steps.check-file-exists.outputs.isEmpty }} 
+        if: ${{ github.event.inputs.full }} == "full" || ${{ steps.check-file-exists.outputs.isEmpty }} 
         run: |
           echo ${{ steps.check-file-exists.outputs.isEmpty }}
           echo "step above is ture"
