@@ -32,6 +32,17 @@ jobs:
       - name: Run a one-line script
         run: echo Hello, world!
       
+      - name: Run a script
+        id: check-file-exists
+        run: |
+          sudo mkdir -p ./markdown-pages
+          [ "$(ls -A ./markdown-pages)" ] || echo "::set-output name=isEmpty::true"
+      
+      - name: Run a script
+        if: ${{ steps.check-file-exists.outputs.isEmpty }} == 'true'
+        run: |
+          echo "step above is ture"
+      
       - name: sleep
         run: |
           sleep 180
