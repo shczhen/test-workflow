@@ -9,13 +9,14 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  repository_dispatch:
 
   # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-    inputs:
-      full:
-        description: 'is full'     
-        required: false
+#   workflow_dispatch:
+#     inputs:
+#       full:
+#         description: 'is full'     
+#         required: false
 
 concurrency: staging_environment
 
@@ -43,7 +44,7 @@ jobs:
           [ "$(ls -A ./markdown-pages)" ] || echo "::set-output name=isEmpty::true"
       
       - name: Run a script
-        if: github.event.inputs.full == "full" || ${{ steps.check-file-exists.outputs.isEmpty }} 
+        if: github.event.client_payload.download_type == 'full' || ${{ steps.check-file-exists.outputs.isEmpty }} 
         run: |
           echo ${{ steps.check-file-exists.outputs.isEmpty }}
           echo "step above is ture"
