@@ -39,8 +39,9 @@ jobs:
           [ "$(ls -A ./markdown-pages)" ] || echo "::set-output name=isEmpty::true"
       
       - name: Run a script
-        if: ${{ steps.check-file-exists.outputs.isEmpty2 }} == 'true'
+        if: ${{ steps.check-file-exists.outputs.isEmpty }} == 'true'
         run: |
+          echo ${{ steps.check-file-exists.outputs.isEmpty }}
           echo "step above is ture"
       
       - name: sleep
