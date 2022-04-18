@@ -35,7 +35,7 @@ jobs:
       - name: Run a script
         id: check-file-exists
         run: |
-          sudo mkdir -p ./markdown-pages
+          sudo mkdir -p ./markdown-pages/zh
           [ "$(ls -A ./markdown-pages)" ] || echo "::set-output name=isEmpty::true"
       
       - name: Run a script
