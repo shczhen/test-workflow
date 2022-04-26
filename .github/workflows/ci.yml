@@ -40,6 +40,11 @@ jobs:
       - name: Run a one-line script
         run: echo Hello, world!
       
+      - name: Turnstyle
+        uses: softprops/turnstyle@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
       - name: Run a script
         id: check-file-exists
         run: |
