@@ -75,23 +75,31 @@ jobs:
     container:
       image: andelf/doc-build:0.1.9
     steps:
-      - name: Run a script
-        run: |
-          whoami
-          pwd
-          sudo git clone https://{{GH_FULL_REPO}}@https://github.com/pingcap-inc/enterprise-docs.git
-          sudo chmod 777 -R enterprise-doc
-          cd enterprise-doc
-          ls
-          git submodule update --remote
-          ls docs-cn/scripts
-          cd docs-cn
-          python3 scripts/merge_by_toc.py
-          pwd
+      # - name: Run a script
+      #   run: |
+      #     whoami
+      #     pwd
+      #     sudo git clone https://${{GH_FULL_REPO}}@github.com/pingcap-inc/enterprise-docs.git
+      #     sudo chmod 777 -R enterprise-doc
+      #     cd enterprise-doc
+      #     ls
+      #     git submodule update --remote
+      #     ls docs-cn/scripts
+      #     cd docs-cn
+      #     python3 scripts/merge_by_toc.py
+      #     pwd
+      - run: |
+        sudo mkdir -p test
+        sudo chmod 777 -R test
+      - uses: actions/checkout@v3
+        with:
+          token: ${{GH_FULL_REPO}}
+          submodules: true
+          path: test
       - uses: actions/upload-artifact@master
         with:
           name: my-artifact
-          path: enterprise-doc/docs-cn/docs.md
+          path: test/enterprise-doc/docs-cn/TOC.md
 
   third:
     needs: second
@@ -105,7 +113,7 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: my-artifact
-          path: enterprise-doc/docs-cn
+          path: test/enterprise-doc/docs-cn/TOC.md
       - name: Display structure of downloaded files
         run: ls -R
-        working-directory: enterprise-doc/docs-cn
+        working-directory: test/enterprise-doc/docs-cn
