@@ -74,15 +74,15 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: andelf/doc-build:0.1.9
-      steps:
-        - name: Run a script
-          run: |
-            whoami
-            pwd
-        # - uses: actions/upload-artifact@master
-        #   with:
-        #     name: my-artifact
-        #     path: opt/data/docs/scripts
+    steps:
+      - name: Run a script
+        run: |
+          whoami
+          pwd
+      # - uses: actions/upload-artifact@master
+      #   with:
+      #     name: my-artifact
+      #     path: opt/data/docs/scripts
 
   third:
     needs: second
