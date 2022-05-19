@@ -101,10 +101,15 @@ jobs:
           repository: pingcap/docs
           token: ${{ secrets.GH_FULL_REPO }}
           path: test/enterprise-docs/docs
+      - uses: actions/setup-node@v3
+          with:
+            node-version: 16
+      - run: |
+          node -v
       - uses: actions/upload-artifact@master
         with:
           name: my-artifact
-          path: test/enterprise-doc/docs-cn/TOC.md
+          path: test/enterprise-doc/docs/TOC.md
 
   third:
     needs: second
@@ -118,7 +123,7 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: my-artifact
-          path: test/enterprise-doc/docs-cn/TOC.md
+          path: test/enterprise-doc/docs/TOC.md
       - name: Display structure of downloaded files
         run: ls -R
-        working-directory: test/enterprise-doc/docs-cn
+        working-directory: test/enterprise-doc/docs
