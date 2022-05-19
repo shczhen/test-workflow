@@ -102,8 +102,8 @@ jobs:
           token: ${{ secrets.GH_FULL_REPO }}
           path: test/enterprise-docs/docs
       - uses: actions/setup-node@v3
-          with:
-            node-version: 16
+        with:
+          node-version: 16
       - run: |
           node -v
       - uses: actions/upload-artifact@master
