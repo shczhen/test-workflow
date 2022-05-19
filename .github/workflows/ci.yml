@@ -29,6 +29,7 @@ jobs:
       max-parallel: 1
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    container: andelf/doc-build:0.1.9
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -66,14 +67,8 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
 
-      - name: executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          port: ${{ secrets.PORT }}
-          script: |
-            cd /data/tidb-book/
-            ls -l
-            docker version
+      - name: test
+        run: |
+          pwd
+          ls -l
+          ls -l /opt/data
