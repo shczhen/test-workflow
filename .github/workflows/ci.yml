@@ -6,20 +6,19 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   repository_dispatch:
 
   # Allows you to run this workflow manually from the Actions tab
 #   workflow_dispatch:
 #     inputs:
 #       full:
-#         description: 'is full'     
+#         description: 'is full'
 #         required: false
 
 # concurrency: staging_environment
-
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -39,30 +38,42 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Hello, world!
-      
+
       - name: Turnstyle
         uses: softprops/turnstyle@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Run a script
         id: check-file-exists
         run: |
           sudo mkdir -p ./markdown-pages
           [ "$(ls -A ./markdown-pages)" ] || echo "::set-output name=isEmpty::true"
-      
+
       - name: Run a script
         if: ${{ github.event.client_payload.download_type == 'full' || steps.check-file-exists.outputs.isEmpty }}
         run: |
           echo ${{ steps.check-file-exists.outputs.isEmpty }}
           echo "step above is ture"
-      
-      - name: sleep
-        run: |
-          sleep 180
+
+      # - name: sleep
+      #   run: |
+      #     sleep 180
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
+
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /data/tidb-book/
+            ls -l
+            docker version
