@@ -79,10 +79,11 @@ jobs:
         run: |
           whoami
           pwd
-      # - uses: actions/upload-artifact@master
-      #   with:
-      #     name: my-artifact
-      #     path: opt/data/docs/scripts
+          ls /opt/data/docs/scripts
+      - uses: actions/upload-artifact@master
+        with:
+          name: my-artifact
+          path: /opt/data/docs/scripts
 
   third:
     needs: second
@@ -96,7 +97,7 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: my-artifact
-          path: opt/data/docs/scripts
+          path: /opt/data/docs/scripts
       - name: Display structure of downloaded files
         run: ls -R
-        working-directory: path/to/artifact
+        working-directory: /opt/data/docs/scripts
