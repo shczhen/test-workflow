@@ -66,12 +66,6 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
 
-      - name: test
-        run: |
-          pwd
-          ls -l
-          ls -l /opt/data
-
   second:
     needs: firstJob
     name: test container
