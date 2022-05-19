@@ -95,8 +95,12 @@ jobs:
         with:
           repository: pingcap-inc/enterprise-docs
           token: ${{ secrets.GH_FULL_REPO }}
-          submodules: true
           path: test
+      - uses: actions/checkout@v3
+        with:
+          repository: pingcap/docs
+          token: ${{ secrets.GH_FULL_REPO }}
+          path: test/enterprise-docs/docs
       - uses: actions/upload-artifact@master
         with:
           name: my-artifact
