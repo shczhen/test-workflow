@@ -79,11 +79,19 @@ jobs:
         run: |
           whoami
           pwd
-          ls /opt/data/docs/scripts
+          sudo git clone https://{{GH_FULL_REPO}}@https://github.com/pingcap-inc/enterprise-docs.git
+          sudo chmod 777 -R enterprise-doc
+          cd enterprise-doc
+          ls
+          git submodule update --remote
+          ls docs-cn/scripts
+          cd docs-cn
+          python3 scripts/merge_by_toc.py
+          pwd
       - uses: actions/upload-artifact@master
         with:
           name: my-artifact
-          path: /opt/data/docs/scripts
+          path: enterprise-doc/docs-cn/docs.md
 
   third:
     needs: second
@@ -97,7 +105,7 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: my-artifact
-          path: /opt/data/docs/scripts
+          path: enterprise-doc/docs-cn
       - name: Display structure of downloaded files
         run: ls -R
-        working-directory: /opt/data/docs/scripts
+        working-directory: enterprise-doc/docs-cn
