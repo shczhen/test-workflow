@@ -89,8 +89,8 @@ jobs:
       #     python3 scripts/merge_by_toc.py
       #     pwd
       - run: |
-        sudo mkdir -p test
-        sudo chmod 777 -R test
+          sudo mkdir -p test
+          sudo chmod 777 -R test
       - uses: actions/checkout@v3
         with:
           token: ${{GH_FULL_REPO}}
