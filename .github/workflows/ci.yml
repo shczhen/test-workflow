@@ -72,3 +72,38 @@ jobs:
           pwd
           ls -l
           ls -l /opt/data
+
+  second:
+    needs: firstJob
+    name: test container
+    strategy:
+      max-parallel: 1
+    runs-on: ubuntu-latest
+    container: andelf/doc-build:0.1.9
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Run a script
+        run: |
+          ls
+      - uses: actions/upload-artifact@master
+        with:
+          name: my-artifact
+          path: opt/data/docs/scripts
+
+  third:
+    needs: second
+    name: test container pass files
+    strategy:
+      max-parallel: 1
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: my-artifact
+          path: opt/data/docs/scripts
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: path/to/artifact
