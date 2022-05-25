@@ -66,68 +66,78 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
 
-  second:
-    needs: firstJob
-    name: test container
+  # second:
+  #   needs: firstJob
+  #   name: test container
+  #   strategy:
+  #     max-parallel: 1
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: andelf/doc-build:0.1.9
+  #   steps:
+  #     - run: |
+  #         sudo mkdir -p test
+  #         sudo chmod 777 -R test
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         repository: pingcap-inc/enterprise-docs
+  #         token: ${{ secrets.GH_FULL_REPO }}
+  #         path: test
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         repository: pingcap/docs
+  #         token: ${{ secrets.GH_FULL_REPO }}
+  #         path: test/enterprise-docs/docs
+  #     - run: |
+  #         sudo mkdir -p nvm
+  #         sudo chmod 777 nvm
+  #         cd nvm
+  #         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | sh
+  #         export NVM_DIR="$HOME/.nvm"
+  #         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  #         nvm install 16
+  #         node -v
+  #     - uses: actions/upload-artifact@master
+  #       with:
+  #         name: my-artifact
+  #         path: test/enterprise-doc/docs/TOC.md
+
+  # third:
+  #   needs: second
+  #   name: test container pass files
+  #   strategy:
+  #     max-parallel: 1
+  #   runs-on: ubuntu-latest
+
+  #   # Steps represent a sequence of tasks that will be executed as part of the job
+  #   steps:
+  #     - uses: actions/download-artifact@master
+  #       with:
+  #         name: my-artifact
+  #         path: test/enterprise-doc/docs/TOC.md
+  #     - name: Display structure of downloaded files
+  #       run: ls -R
+  #       working-directory: test/enterprise-doc/docs
+
+  secondJob:
+    name: build
     strategy:
       max-parallel: 1
     runs-on: ubuntu-latest
-    container:
-      image: andelf/doc-build:0.1.9
-    steps:
-      # - name: Run a script
-      #   run: |
-      #     whoami
-      #     pwd
-      #     sudo git clone https://${{GH_FULL_REPO}}@github.com/pingcap-inc/enterprise-docs.git
-      #     sudo chmod 777 -R enterprise-doc
-      #     cd enterprise-doc
-      #     ls
-      #     git submodule update --remote
-      #     ls docs-cn/scripts
-      #     cd docs-cn
-      #     python3 scripts/merge_by_toc.py
-      #     pwd
-      - run: |
-          sudo mkdir -p test
-          sudo chmod 777 -R test
-      - uses: actions/checkout@v3
-        with:
-          repository: pingcap-inc/enterprise-docs
-          token: ${{ secrets.GH_FULL_REPO }}
-          path: test
-      - uses: actions/checkout@v3
-        with:
-          repository: pingcap/docs
-          token: ${{ secrets.GH_FULL_REPO }}
-          path: test/enterprise-docs/docs
-      - run: |
-          sudo mkdir -p nvm
-          sudo chmod 777 nvm
-          cd nvm
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | sh
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-          nvm install 16
-          node -v
-      - uses: actions/upload-artifact@master
-        with:
-          name: my-artifact
-          path: test/enterprise-doc/docs/TOC.md
 
-  third:
-    needs: second
-    name: test container pass files
-    strategy:
-      max-parallel: 1
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/download-artifact@master
+      - uses: actions/checkout@v3
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v1
         with:
-          name: my-artifact
-          path: test/enterprise-doc/docs/TOC.md
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: test/enterprise-doc/docs
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+      - name: Run scripts
+        run: |
+          cd docsearch
+          echo "APPLICATION_ID=${{ secrets.GATSBY_ALGOLIA_APPLICATION_ID }}\nAPI_KEY=${{ secrets.GATSBY_ALGOLIA_API_KEY }}\nGITHUB_AUTH_TOKEN=${{ secrets.GH_AUTH_TOKEN }}" > .env
+          export DOCKER_REGISTRY="${{ secrets.DOCKER_REGISTRY }}"
+          ./run-algolia-crawler-incrementally.sh .
+          git status
