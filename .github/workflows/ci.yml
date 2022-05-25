@@ -140,5 +140,5 @@ jobs:
           echo "APPLICATION_ID=${{ secrets.GATSBY_ALGOLIA_APPLICATION_ID }}\nAPI_KEY=${{ secrets.GATSBY_ALGOLIA_API_KEY }}\nGITHUB_AUTH_TOKEN=${{ secrets.GH_AUTH_TOKEN }}" > .env
           export DOCKER_REGISTRY="${{ secrets.DOCKER_REGISTRY }}"
           echo `pwd`/docsearch
-          ./run-algolia-crawler-incrementally.sh `pwd`/docsearch
+          ./run-algolia-crawler-incrementally.sh `pwd`
           git status
