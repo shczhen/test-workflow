@@ -121,7 +121,7 @@ jobs:
 
   secondJob:
     name: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
       - uses: actions/checkout@v3
@@ -133,11 +133,10 @@ jobs:
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
       - name: Run scripts
         run: |
-          curl https://api.github.com/repos/pingcap/docs-cn/commits/master
-          # cd docsearch
-          # echo "APPLICATION_ID=${{ secrets.GATSBY_ALGOLIA_APPLICATION_ID }}\nAPI_KEY=${{ secrets.GATSBY_ALGOLIA_API_KEY }}\nGITHUB_AUTH_TOKEN=${{ secrets.GH_AUTH_TOKEN }}" > .env
-          # export DOCKER_REGISTRY="${{ secrets.DOCKER_REGISTRY }}"
-          # echo `pwd`/docsearch
-          # ls -R
-          # ./run-algolia-crawler-incrementally.sh `pwd`
-          # git status
+          cd docsearch
+          echo "APPLICATION_ID=${{ secrets.GATSBY_ALGOLIA_APPLICATION_ID }}\nAPI_KEY=${{ secrets.GATSBY_ALGOLIA_API_KEY }}\nGITHUB_AUTH_TOKEN=${{ secrets.GH_AUTH_TOKEN }}" > .env
+          export DOCKER_REGISTRY="${{ secrets.DOCKER_REGISTRY }}"
+          echo `pwd`/docsearch
+          ls -R
+          ./run-algolia-crawler-incrementally.sh `pwd`
+          git status
