@@ -176,7 +176,8 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS=key.json
           export PROJECT_ID=${{secrets.GCP_PROJECT_ID}}
           export GLOSSARY_ID=${{secrets.GCP_GLOSSARY_ID}}
-          npm i
+          yarn
+          node -v
           node src/index.js
           ls -l
           cd ..
