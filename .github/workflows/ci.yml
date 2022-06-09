@@ -172,10 +172,10 @@ jobs:
       - name: Config and translate
         run: |
           cd markdown-translator
-          echo ${{GCP_KEY}} >> key.json
+          echo ${{secrets.GCP_KEY}} >> key.json
           export GOOGLE_APPLICATION_CREDENTIALS=key.json
-          export PROJECT_ID=${{GCP_PROJECT_ID}}
-          export GLOSSARY_ID=${{GCP_GLOSSARY_ID}}
+          export PROJECT_ID=${{secrets.GCP_PROJECT_ID}}
+          export GLOSSARY_ID=${{secrets.GCP_GLOSSARY_ID}}
           npm i
           node src/index.js
           cd ..
