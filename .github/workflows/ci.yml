@@ -119,28 +119,75 @@ jobs:
   #       run: ls -R
   #       working-directory: test/enterprise-doc/docs
 
-  secondJob:
-    name: build
-    runs-on: ubuntu-18.04
+  # secondJob:
+  #   name: build
+  #   runs-on: ubuntu-18.04
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Login to Container Registry
+  #       uses: docker/login-action@v1
+  #       with:
+  #         registry: ${{ secrets.DOCKER_REGISTRY }}
+  #         username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+  #         password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+  #     - name: Run scripts
+  #       run: |
+  #         cd docsearch
+  #         touch .env
+  #         echo "APPLICATION_ID=${{ secrets.GATSBY_ALGOLIA_APPLICATION_ID }}" >> .env
+  #         echo "API_KEY=${{ secrets.GATSBY_ALGOLIA_API_KEY }}" >> .env
+  #         echo "GITHUB_AUTH_TOKEN=${{ secrets.GH_AUTH_TOKEN }}" >> .env
+  #         cat .env
+  #         export DOCKER_REGISTRY="${{ secrets.DOCKER_REGISTRY }}"
+  #         export GITHUB_AUTH_TOKEN=${{ secrets.GH_AUTH_TOKEN }}
+  #         ls -R
+  #         ./run-algolia-crawler-incrementally.sh `pwd`
+  #         git status
+
+  translation:
+    name: translation
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - name: Login to Container Registry
-        uses: docker/login-action@v1
+        name: Download translator repo
         with:
-          registry: ${{ secrets.DOCKER_REGISTRY }}
-          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
-          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+          repository: "shczhen/markdown-translator"
+          path: "markdown-translator"
+      - uses: actions/checkout@v3
+        name: Download docs repo and specified branch
+        with:
+          ref: "i18n-ja-release-5.4"
+          path: "docs"
+      - uses: actions/setup-node@v3
+        name: Setup node 16
+        with:
+          node-version: 16
       - name: Run scripts
         run: |
-          cd docsearch
-          touch .env
-          echo "APPLICATION_ID=${{ secrets.GATSBY_ALGOLIA_APPLICATION_ID }}" >> .env
-          echo "API_KEY=${{ secrets.GATSBY_ALGOLIA_API_KEY }}" >> .env
-          echo "GITHUB_AUTH_TOKEN=${{ secrets.GH_AUTH_TOKEN }}" >> .env
-          cat .env
-          export DOCKER_REGISTRY="${{ secrets.DOCKER_REGISTRY }}"
-          export GITHUB_AUTH_TOKEN=${{ secrets.GH_AUTH_TOKEN }}
-          ls -R
-          ./run-algolia-crawler-incrementally.sh `pwd`
+          apt install tree
+          export GH_TOKEN=${{github.token}}
+          cp -r docs/file1.md markdown-translator/markdowns
+      - name: Config and translate
+        run: |
+          cd markdown-translator
+          echo ${{GCP_KEY}} >> key.json
+          export GOOGLE_APPLICATION_CREDENTIALS=key.json
+          export PROJECT_ID=${{GCP_PROJECT_ID}}
+          export GLOSSARY_ID=${{GCP_GLOSSARY_ID}}
+          npm i
+          node src/index.js
+          cd ..
+      - name: Copy translated files to docs repo
+        run: |
+          cp -r markdown-translator/output/markdowns/* docs/
+      - name: Git commit and push
+        run: |
+          cd docs
           git status
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "update translated files"
+          git push
