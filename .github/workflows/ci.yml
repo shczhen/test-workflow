@@ -178,6 +178,7 @@ jobs:
           export GLOSSARY_ID=${{secrets.GCP_GLOSSARY_ID}}
           npm i
           node src/index.js
+          ls -l
           cd ..
       - name: Copy translated files to docs repo
         run: |
