@@ -172,7 +172,7 @@ jobs:
       - name: Config and translate
         run: |
           cd markdown-translator
-          echo ${{secrets.GCP_KEY}} >> key.json
+          echo -e ${{secrets.GCP_KEY}} >> key.json
           export GOOGLE_APPLICATION_CREDENTIALS=key.json
           export PROJECT_ID=${{secrets.GCP_PROJECT_ID}}
           export GLOSSARY_ID=${{secrets.GCP_GLOSSARY_ID}}
