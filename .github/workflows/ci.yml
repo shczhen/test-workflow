@@ -166,7 +166,7 @@ jobs:
           node-version: 16
       - name: Run scripts
         run: |
-          apt install tree
+          sudo apt install tree -y
           export GH_TOKEN=${{github.token}}
           cp -r docs/file1.md markdown-translator/markdowns
       - name: Config and translate
