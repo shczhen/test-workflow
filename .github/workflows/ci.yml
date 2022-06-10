@@ -56,6 +56,16 @@ jobs:
           echo ${{ steps.check-file-exists.outputs.isEmpty }}
           echo "step above is ture"
 
+      - name: Check TOC-tidb-cloud.md existence
+        id: check_cloud_toc
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "TOC-tidb-cloud.md"
+      - name: Verify internal links - cloud only
+        if: steps.check_cloud_toc.outputs.files_exists == 'true'
+        run: |
+          echo "file existed"
+
       # - name: sleep
       #   run: |
       #     sleep 180
@@ -145,51 +155,51 @@ jobs:
   #         ./run-algolia-crawler-incrementally.sh `pwd`
   #         git status
 
-  translation:
-    name: translation
-    runs-on: ubuntu-latest
+  # translation:
+  #   name: translation
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
-        name: Download translator repo
-        with:
-          repository: "shczhen/markdown-translator"
-          path: "markdown-translator"
-      - uses: actions/checkout@v3
-        name: Download docs repo and specified branch
-        with:
-          # ref: "i18n-ja-release-5.4"
-          path: "docs"
-      - uses: actions/setup-node@v3
-        name: Setup node 16
-        with:
-          node-version: 16
-      - name: Run scripts
-        run: |
-          sudo apt install tree -y
-          export GH_TOKEN=${{github.token}}
-          cp -r docs/tmp markdown-translator/markdowns
-      - name: Config and translate
-        run: |
-          cd markdown-translator
-          echo ${{secrets.GCP_KEY}} | base64 --decode >> key.json
-          export GOOGLE_APPLICATION_CREDENTIALS=key.json
-          export PROJECT_ID=${{secrets.GCP_PROJECT_ID}}
-          export GLOSSARY_ID=${{secrets.GCP_GLOSSARY_ID}}
-          yarn
-          node -v
-          node src/index.js
-          ls -l
-          cd ..
-      - name: Copy translated files to docs repo
-        run: |
-          cp -r markdown-translator/output/markdowns/* docs/
-      - name: Git commit and push
-        run: |
-          cd docs
-          git status
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "update translated files"
-          git push
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       name: Download translator repo
+  #       with:
+  #         repository: "shczhen/markdown-translator"
+  #         path: "markdown-translator"
+  #     - uses: actions/checkout@v3
+  #       name: Download docs repo and specified branch
+  #       with:
+  #         # ref: "i18n-ja-release-5.4"
+  #         path: "docs"
+  #     - uses: actions/setup-node@v3
+  #       name: Setup node 16
+  #       with:
+  #         node-version: 16
+  #     - name: Run scripts
+  #       run: |
+  #         sudo apt install tree -y
+  #         export GH_TOKEN=${{github.token}}
+  #         cp -r docs/tmp markdown-translator/markdowns
+  #     - name: Config and translate
+  #       run: |
+  #         cd markdown-translator
+  #         echo ${{secrets.GCP_KEY}} | base64 --decode >> key.json
+  #         export GOOGLE_APPLICATION_CREDENTIALS=key.json
+  #         export PROJECT_ID=${{secrets.GCP_PROJECT_ID}}
+  #         export GLOSSARY_ID=${{secrets.GCP_GLOSSARY_ID}}
+  #         yarn
+  #         node -v
+  #         node src/index.js
+  #         ls -l
+  #         cd ..
+  #     - name: Copy translated files to docs repo
+  #       run: |
+  #         cp -r markdown-translator/output/markdowns/* docs/
+  #     - name: Git commit and push
+  #       run: |
+  #         cd docs
+  #         git status
+  #         git config user.name github-actions
+  #         git config user.email github-actions@github.com
+  #         git add .
+  #         git commit -m "update translated files"
+  #         git push
